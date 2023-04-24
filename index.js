@@ -79,6 +79,14 @@ async function run() {
       );
       res.send(result);
     });
+
+    // Delete a user
+    app.delete("/user/:userId", async (req, res) => {
+      const { userId } = req.params;
+      const filter = { _id: new ObjectId(userId) };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
