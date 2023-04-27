@@ -26,12 +26,13 @@ async function run() {
 
     // create a database
     const usersCollection = client.db("usersCollection").collection("users");
+
     // home
     app.get("/", (req, res) => {
       res.send({ message: "Server is running" });
     });
 
-    // get all  user
+    // get all  users withOut pagination
     app.get("/users", async (req, res) => {
       // Query for a movie that has the title 'The Room'
       const query = {};
@@ -39,6 +40,26 @@ async function run() {
       const cursor = usersCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
+    });
+
+    // get all  users with pagination
+    app.get("/usersWithPagination", async (req, res) => {
+      const { currentPage, userPerPage } = req.query;
+      const query = {};
+      const options = {};
+      const cursor = usersCollection.find(query, options);
+      // const result = await cursor.limit().skip().toArray();
+      const result = await cursor
+        .skip(parseInt(currentPage) * parseInt(userPerPage))
+        .limit(parseInt(userPerPage))
+        .toArray();
+      res.send(result);
+    });
+
+    // get total users count
+    app.get("/totalUsersCount", async (req, res) => {
+      const result = await usersCollection.estimatedDocumentCount();
+      res.send({ count: result });
     });
 
     // get a  user
